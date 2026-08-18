@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="he">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>דף עבודה אינטראקטיבי - מדדי מרכז</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Rubik -->
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Rubik', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#eff6ff',
+                            100: '#dbeafe',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #f8fafc;
+            color: #1e293b;
+        }
+        /* Hide number input arrows */
+        input[type="number"]::-webkit-outer-spin-button,
+        input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        input[type="number"] {
+            -moz-appearance: textfield;
+        }
+        .input-field {
+            transition: all 0.3s ease;
+        }
+        .input-correct {
+            border-color: #22c55e !important;
+            background-color: #f0fdf4 !important;
+            color: #166534 !important;
+        }
+        .input-error {
+            border-color: #ef4444 !important;
+            background-color: #fef2f2 !important;
+            color: #991b1b !important;
+            animation: shake 0.4s 1 linear;
+        }
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            50% { transform: translateX(5px); }
+            75% { transform: translateX(-5px); }
+            100% { transform: translateX(0); }
+        }
+        .feedback-icon {
+            display: none;
+        }
+        .input-correct + .feedback-icon {
+            display: inline-block;
+            color: #22c55e;
+        }
+        .input-error + .feedback-icon {
+            display: inline-block;
+            color: #ef4444;
+        }
+    </style>
+</head>
+<body class="antialiased min-h-screen py-8 px-4 sm:px-6 lg:px-8">
+    <main class="max-w-4xl mx-auto space-y-8">
+        
+        <!-- Header -->
+        <header class="text-center space-y-4">
+            <div class="inline-flex items-center justify-center p-3 bg-brand-100 rounded-full mb-2">
+                <i class="fa-solid fa-chart-pie text-3xl text-brand-600"></i>
+            </div>
+            <h1 class="text-3xl md:text-4xl font-bold text-slate-800">ניתוח נתוני שכר בחברת סטארט-אפ</h1>
+            <p class="text-lg text-slate-600 max-w-2xl mx-auto">דף עבודה אינטראקטיבי בנושא ממוצע, חציון, שכיח והשפעת ערכי קיצון.</p>
+        </header>
+
+        <!-- Scenario Card -->
+        <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 md:p-8 relative overflow-hidden">
+            <div class="absolute top-0 right-0 w-2 h-full bg-brand-500"></div>
+            <h2 class="text-xl font-bold mb-4 text-slate-800"><i class="fa-solid fa-building me-2 text-brand-500"></i> חברת "טק-בוסט" (TechBoost)</h2>
+            <p class="text-slate-700 mb-6 leading-relaxed">
+                החברה מפתחת פתרונות בינה מלאכותית. הנהלת החברה החליטה לבחון את מבנה השכר בארגון.
+                לפניכם מוצגים נתוני השכר החודשי (ברוטו, בשקלים) של 5 עובדים המייצגים תפקידים שונים בחברה:
+            </p>
+            
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                <div class="bg-slate-50 p-4 rounded-xl border border-slate-100 flex justify-between items-center">
+                    <span class="font-medium">סטודנט</span>
+                    <span class="font-bold text-brand-600">10,000 ₪</span>
+                </div>
+                <div class="bg-slate-50 p-4 rounded-xl border border-slate-100 flex justify-between items-center">
+                    <span class="font-medium">תומך טכני</span>
+                    <span class="font-bold text-brand-600">10,000 ₪</span>
+                </div>
+                <div class="bg-slate-50 p-4 rounded-xl border border-slate-100 flex justify-between items-center">
+                    <span class="font-medium">מנכ"ל ומייסד</span>
+                    <span class="font-bold text-brand-600">90,000 ₪</span>
+                </div>
+                <div class="bg-slate-50 p-4 rounded-xl border border-slate-100 flex justify-between items-center">
+                    <span class="font-medium">מפתח בכיר</span>
+                    <span class="font-bold text-brand-600">25,000 ₪</span>
+                </div>
+                <div class="bg-slate-50 p-4 rounded-xl border border-slate-100 flex justify-between items-center">
+                    <span class="font-medium">מפתח ג'וניור</span>
+                    <span class="font-bold text-brand-600">15,000 ₪</span>
+                </div>
+            </div>
+        </section>
+
+        <div class="space-y-6" id="tasks-container">
+            <!-- Task 1: Order Data -->
+            <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 md:p-8">
+                <h3 class="text-lg font-bold mb-4"><span class="bg-brand-100 text-brand-700 py-1 px-3 rounded-lg me-2">משימה 1</span> ארגון הנתונים</h3>
+                <p class="text-slate-600 mb-6">כדי שיהיה קל לעבוד, סדרו את 5 המשכורות מהסכום <strong>הקטן ביותר לגדול ביותר</strong>:</p>
+                
+                <div class="flex flex-wrap gap-4 items-center justify-center sm:justify-start dir-ltr flex-row-reverse">
+                    <!-- Inputs are right-to-left logically, but visually we want them small to large. -->
+                    <div class="relative">
+                        <input type="text" id="sort-1" inputmode="numeric" class="input-field w-24 text-center p-3 border-2 border-slate-300 rounded-xl focus:outline-none focus:border-brand-500 font-bold text-lg" placeholder="1">
+                    </div>
+                    <i class="fa-solid fa-chevron-left text-slate-300"></i>
+                    <div class="relative">
+                        <input type="text" id="sort-2" inputmode="numeric" class="input-field w-24 text-center p-3 border-2 border-slate-300 rounded-xl focus:outline-none focus:border-brand-500 font-bold text-lg" placeholder="2">
+                    </div>
+                    <i class="fa-solid fa-chevron-left text-slate-300"></i>
+                    <div class="relative">
+                        <input type="text" id="sort-3" inputmode="numeric" class="input-field w-24 text-center p-3 border-2 border-slate-300 rounded-xl focus:outline-none focus:border-brand-500 font-bold text-lg" placeholder="3">
+                    </div>
+                    <i class="fa-solid fa-chevron-left text-slate-300"></i>
+                    <div class="relative">
+                        <input type="text" id="sort-4" inputmode="numeric" class="input-field w-24 text-center p-3 border-2 border-slate-300 rounded-xl focus:outline-none focus:border-brand-500 font-bold text-lg" placeholder="4">
+                    </div>
+                    <i class="fa-solid fa-chevron-left text-slate-300"></i>
+                    <div class="relative">
+                        <input type="text" id="sort-5" inputmode="numeric" class="input-field w-24 text-center p-3 border-2 border-slate-300 rounded-xl focus:outline-none focus:border-brand-500 font-bold text-lg" placeholder="5">
+                    </div>
+                </div>
+                <div class="mt-6 text-center sm:text-right">
+                    <button onclick="checkTask1()" class="bg-brand-600 hover:bg-brand-700 text-white font-bold py-2 px-6 rounded-xl transition-all text-sm shadow-sm hover:shadow-md"><i class="fa-solid fa-check me-2"></i>בדוק משימה 1</button>
+                </div>
+            </section>
+
+            <!-- Task 2: Mean -->
+            <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 md:p-8">
+                <h3 class="text-lg font-bold mb-4"><span class="bg-brand-100 text-brand-700 py-1 px-3 rounded-lg me-2">משימה 2</span> חישוב הממוצע (Average)</h3>
+                <p class="text-slate-600 mb-6">מהו השכר הממוצע בחברת טק-בוסט?</p>
+                
+                <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4 text-xl font-bold">
+                    <div class="flex items-center gap-3">
+                        <input type="text" id="mean-result" inputmode="numeric" class="input-field w-full sm:w-48 text-center p-3 border-2 border-slate-300 rounded-xl focus:outline-none focus:border-brand-500 text-brand-700" placeholder="הקלידו את הממוצע">
+                        <span class="text-slate-500 font-medium">₪</span>
+                    </div>
+                    <button onclick="checkTask2()" class="bg-brand-600 hover:bg-brand-700 text-white font-bold py-3 px-6 rounded-xl transition-all text-sm shadow-sm hover:shadow-md"><i class="fa-solid fa-check me-2"></i>בדוק משימה 2</button>
+                </div>
+                <div id="hint-task2" class="hidden mt-6 p-4 bg-amber-50 border border-amber-200 rounded-xl text-amber-900 text-sm">
+                    <i class="fa-solid fa-lightbulb text-amber-500 me-2 text-lg"></i> <strong>תשובה שגויה. איך לחשב?</strong> כדי למצוא את הממוצע, עליכם לחבר את כל 5 המשכורות, ולחלק את הסכום שקיבלתם במספר העובדים (5).
+                </div>
+            </section>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Task 3: Median -->
+                <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+                    <h3 class="text-lg font-bold mb-4"><span class="bg-brand-100 text-brand-700 py-1 px-3 rounded-lg me-2">משימה 3</span> מציאת החציון</h3>
+                    <p class="text-slate-600 mb-4">מהו חציון השכר בחברה?</p>
+                    <div class="flex flex-col items-start gap-4">
+                        <div class="flex items-center gap-3 w-full">
+                            <input type="text" id="median-result" inputmode="numeric" class="input-field w-full text-center p-3 border-2 border-slate-300 rounded-xl focus:outline-none focus:border-brand-500 font-bold text-xl" placeholder="הקלידו את החציון">
+                            <span class="text-slate-500 font-medium">₪</span>
+                        </div>
+                        <button onclick="checkTask3()" class="bg-brand-600 hover:bg-brand-700 text-white font-bold py-3 px-6 rounded-xl transition-all text-sm w-full sm:w-auto shadow-sm hover:shadow-md"><i class="fa-solid fa-check me-2"></i>בדוק משימה 3</button>
+                    </div>
+                    <div id="hint-task3" class="hidden mt-6 p-4 bg-amber-50 border border-amber-200 rounded-xl text-amber-900 text-sm">
+                        <i class="fa-solid fa-lightbulb text-amber-500 me-2 text-lg"></i> <strong>תשובה שגויה. איך למצוא?</strong> החציון הוא המשכורת שנמצאת <strong>בדיוק באמצע</strong> הרשימה, לאחר שסידרתם אותה מהקטן לגדול (בדיוק כפי שעשיתם במשימה 1).
+                    </div>
+                </section>
+
+                <!-- Task 4: Mode -->
+                <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+                    <h3 class="text-lg font-bold mb-4"><span class="bg-brand-100 text-brand-700 py-1 px-3 rounded-lg me-2">משימה 4</span> מציאת השכיח</h3>
+                    <p class="text-slate-600 mb-4">מהו השכר השכיח בחברה?</p>
+                    <div class="flex flex-col items-start gap-4">
+                        <div class="flex items-center gap-3 w-full">
+                            <input type="text" id="mode-result" inputmode="numeric" class="input-field w-full text-center p-3 border-2 border-slate-300 rounded-xl focus:outline-none focus:border-brand-500 font-bold text-xl" placeholder="הקלידו את השכיח">
+                            <span class="text-slate-500 font-medium">₪</span>
+                        </div>
+                        <button onclick="checkTask4()" class="bg-brand-600 hover:bg-brand-700 text-white font-bold py-3 px-6 rounded-xl transition-all text-sm w-full sm:w-auto shadow-sm hover:shadow-md"><i class="fa-solid fa-check me-2"></i>בדוק משימה 4</button>
+                    </div>
+                    <div id="hint-task4" class="hidden mt-6 p-4 bg-amber-50 border border-amber-200 rounded-xl text-amber-900 text-sm">
+                         <i class="fa-solid fa-lightbulb text-amber-500 me-2 text-lg"></i> <strong>תשובה שגויה. איך למצוא?</strong> השכיח הוא סכום המשכורת שמופיע <strong>הכי הרבה פעמים</strong> ברשימת הנתונים.
+                    </div>
+                </section>
+            </div>
+
+            <div class="text-center pt-2">
+                <p id="overall-feedback" class="font-bold text-xl text-green-600 hidden animate-bounce"><i class="fa-solid fa-star text-yellow-400"></i> כל הכבוד! פתרתם את כל חישובי הליבה בהצלחה!</p>
+            </div>
+
+            <!-- Task 5: Reflection (Open Question) -->
+            <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 md:p-8 mt-8 border-t-4 border-t-amber-400">
+                <h3 class="text-xl font-bold mb-2"><i class="fa-solid fa-lightbulb text-amber-400 me-2"></i> שאלת הבנה: השפעת ערך קיצון</h3>
+                <p class="text-slate-600 mb-6">
+                    שכר המנכ"ל הוא גבוה מאוד בהשוואה לשאר העובדים, ובסטטיסטיקה הוא נקרא "ערך קיצון".<br><br>
+                    <strong>בהתבסס על החישובים שעשיתם, איזה מדד (ממוצע, חציון או שכיח) מייצג בצורה הטובה ביותר את השכר "הטיפוסי" של רוב העובדים בחברה? הסבירו מדוע, וכיצד השפיעה משכורת המנכ"ל על הממוצע.</strong>
+                </p>
+                <textarea class="w-full border-2 border-slate-300 rounded-xl p-4 focus:outline-none focus:border-amber-400 min-h-[120px] resize-y mb-4" placeholder="הקלידו את תשובתכם כאן..."></textarea>
+                
+                <button onclick="toggleAnswer()" class="text-amber-600 font-medium hover:text-amber-700 flex items-center transition-colors">
+                    <i id="answer-icon" class="fa-solid fa-eye me-2"></i> <span id="answer-text">הצג תשובה לדוגמה</span>
+                </button>
+                
+                <div id="model-answer" class="hidden mt-4 p-5 bg-amber-50 rounded-xl border border-amber-200 text-amber-900 leading-relaxed">
+                    <strong>תשובה מומלצת:</strong><br>
+                    החציון (15,000 ₪) או השכיח (10,000 ₪), הם המדדים שמייצגים בצורה הטובה ביותר את השכר ה"טיפוסי" בחברה. 
+                    הממוצע (30,000 ₪) "נמשך" חזק כלפי מעלה בגלל משכורת המנכ"ל (90,000 ₪ - ערך קיצון), ולכן הממוצע גבוה יותר מהשכר של 4 מתוך 5 העובדים בחברה ולא משקף נאמנה את רובם.
+                </div>
+            </section>
+        </div>
+        
+        <footer class="text-center text-slate-400 text-sm py-6">
+            נוצר עבור למידה אינטראקטיבית וניתוח נתונים
+        </footer>
+    </main>
+
+    <script>
+        // Correct answers definitions
+        const ANSWERS = {
+            sort: [10000, 10000, 15000, 25000, 90000],
+            sum: 150000,
+            count: 5,
+            mean: 30000,
+            median: 15000,
+            mode: 10000
+        };
+
+        // Helper: clean input (remove commas, spaces) and convert to number
+        function parseValue(val) {
+            if (!val) return null;
+            const cleaned = val.replace(/,/g, '').replace(/\s/g, '');
+            const num = parseInt(cleaned, 10);
+            return isNaN(num) ? null : num;
+        }
+
+        // Helper: update input styling based on correctness
+        function setInputState(inputId, isCorrect) {
+            const el = document.getElementById(inputId);
+            if (isCorrect) {
+                el.classList.add('input-correct');
+                el.classList.remove('input-error');
+            } else {
+                el.classList.add('input-error');
+                el.classList.remove('input-correct');
+                // Remove animation class after it plays so it can play again
+                setTimeout(() => el.classList.remove('input-error'), 400);
+                // Keep a static error border
+                setTimeout(() => el.classList.add('border-red-500', 'bg-red-50', 'text-red-700'), 400);
+            }
+        }
+
+        // Reset custom static error classes before re-checking
+        function resetClasses(inputId) {
+            const el = document.getElementById(inputId);
+            el.classList.remove('input-correct', 'input-error', 'border-red-500', 'bg-red-50', 'text-red-700');
+        }
+
+        let tasksCompleted = { 1: false, 2: false, 3: false, 4: false };
+
+        function checkOverallProgress() {
+            if (tasksCompleted[1] && tasksCompleted[2] && tasksCompleted[3] && tasksCompleted[4]) {
+                document.getElementById('overall-feedback').classList.remove('hidden');
+                fireConfetti();
+            }
+        }
+
+        function checkTask1() {
+            let allCorrect = true;
+            for (let i = 1; i <= 5; i++) {
+                const id = `sort-${i}`;
+                resetClasses(id);
+                const val = parseValue(document.getElementById(id).value);
+                if (val === ANSWERS.sort[i-1]) {
+                    setInputState(id, true);
+                } else {
+                    setInputState(id, false);
+                    allCorrect = false;
+                }
+            }
+            tasksCompleted[1] = allCorrect;
+            checkOverallProgress();
+        }
+
+        function checkTask2() {
+            resetClasses('mean-result');
+            const val = parseValue(document.getElementById('mean-result').value);
+            const hintEl = document.getElementById('hint-task2');
+            
+            if (val === ANSWERS.mean) {
+                setInputState('mean-result', true);
+                hintEl.classList.add('hidden');
+                tasksCompleted[2] = true;
+                checkOverallProgress();
+            } else {
+                setInputState('mean-result', false);
+                hintEl.classList.remove('hidden');
+                tasksCompleted[2] = false;
+            }
+        }
+
+        function checkTask3() {
+            resetClasses('median-result');
+            const val = parseValue(document.getElementById('median-result').value);
+            const hintEl = document.getElementById('hint-task3');
+            
+            if (val === ANSWERS.median) {
+                setInputState('median-result', true);
+                hintEl.classList.add('hidden');
+                tasksCompleted[3] = true;
+                checkOverallProgress();
+            } else {
+                setInputState('median-result', false);
+                hintEl.classList.remove('hidden');
+                tasksCompleted[3] = false;
+            }
+        }
+
+        function checkTask4() {
+            resetClasses('mode-result');
+            const val = parseValue(document.getElementById('mode-result').value);
+            const hintEl = document.getElementById('hint-task4');
+            
+            if (val === ANSWERS.mode) {
+                setInputState('mode-result', true);
+                hintEl.classList.add('hidden');
+                tasksCompleted[4] = true;
+                checkOverallProgress();
+            } else {
+                setInputState('mode-result', false);
+                hintEl.classList.remove('hidden');
+                tasksCompleted[4] = false;
+            }
+        }
+
+        // Fun Confetti Effect
+        function fireConfetti() {
+            var duration = 3 * 1000;
+            var animationEnd = Date.now() + duration;
+            var defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+
+            function randomInRange(min, max) {
+                return Math.random() * (max - min) + min;
+            }
+
+            var interval = setInterval(function() {
+                var timeLeft = animationEnd - Date.now();
+
+                if (timeLeft <= 0) {
+                    return clearInterval(interval);
+                }
+
+                var particleCount = 50 * (timeLeft / duration);
+                // since particles fall down, start a bit higher than random
+                confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } }));
+                confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } }));
+            }, 250);
+        }
+
+        // Toggle Model Answer for the open question
+        function toggleAnswer() {
+            const answerDiv = document.getElementById('model-answer');
+            const icon = document.getElementById('answer-icon');
+            const text = document.getElementById('answer-text');
+            
+            if (answerDiv.classList.contains('hidden')) {
+                answerDiv.classList.remove('hidden');
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+                text.innerText = 'הסתר תשובה לדוגמה';
+            } else {
+                answerDiv.classList.add('hidden');
+                icon.classList.add('fa-eye');
+                icon.classList.remove('fa-eye-slash');
+                text.innerText = 'הצג תשובה לדוגמה';
+            }
+        }
+
+        // Add auto-formatting (commas) as user types for specific inputs
+        const inputsToFormat = ['sort-1', 'sort-2', 'sort-3', 'sort-4', 'sort-5', 'mean-result', 'median-result', 'mode-result'];
+        inputsToFormat.forEach(id => {
+            const el = document.getElementById(id);
+            if(el) {
+                el.addEventListener('blur', function(e) {
+                    let val = parseValue(e.target.value);
+                    if (val !== null) {
+                        e.target.value = val.toLocaleString('en-US');
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>
